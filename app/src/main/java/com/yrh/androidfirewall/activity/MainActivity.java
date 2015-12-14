@@ -1,17 +1,15 @@
 package com.yrh.androidfirewall.activity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
-import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -19,10 +17,11 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.SimpleAdapter;
-import android.widget.Switch;
+import android.widget.Toast;
 
 import com.orhanobut.dialogplus.DialogPlus;
 import com.orhanobut.dialogplus.OnItemClickListener;
+import com.orhanobut.dialogplus.ViewHolder;
 import com.yrh.androidfirewall.R;
 import com.yrh.androidfirewall.adapter.PagerViewAdapter;
 import com.yrh.androidfirewall.adapter.PhoneInfoAdapter;
@@ -40,6 +39,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public static final int PAGE_SMSBLACKLIST = 1;
     public static final int PAGE_SETTINGS = 2;
 
+    public static final int INTENT_ADD_PHONE_NUM = 1001;
+
+    public static final int INTENT_FLAG_INCOMMING = 0;
+    public static final int INTENT_FLAG_SMS = 1;
+
     private LayoutInflater mLayoutInflater;
     private List<String> mTitleList = new ArrayList<>();
     private List<View> mViewList = new ArrayList<>();
@@ -50,9 +54,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     // incommingblacklist 组件
     private PhoneInfoAdapter mIncommingBlackListPhoneInfoAdapter;
+    private DialogPlus mIncommingBlackLisDialogPlus;
 
     // SMSblacklist 组件
     private PhoneInfoAdapter mSMSBlackListPhoneInfoAdapter;
+    private DialogPlus mSMSBlackLisDialogPlus;
 
 
     @Override
@@ -115,10 +121,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mTabLayout.setTabsFromPagerAdapter(pagerViewAdapter);     //给 Tabs设置适配器
 
         // 初始化来电黑名单 RecyclerView
-        initRecyclerView(incomingTelegramBlackListView, R.id.recyclerViewIncommingBlackList, mIncommingBlackListPhoneInfoAdapter);
+        initRecyclerView(incomingTelegramBlackListView, R.id.recyclerViewIncommingBlackList);
 
         // 初始化短信黑名单 RecyclerView
-        initRecyclerView(SMSBlackListView, R.id.recyclerViewSMSBlackList, mSMSBlackListPhoneInfoAdapter);
+        initRecyclerView(SMSBlackListView, R.id.recyclerViewSMSBlackList);
     }
 
     /**
@@ -126,7 +132,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
      *
      * @param view
      */
-    private void initRecyclerView(View view, int resourceId, PhoneInfoAdapter adapter) {
+    private void initRecyclerView(View view, int resourceId) {
         RecyclerView recyclerView = (RecyclerView) view.findViewById(resourceId);
 
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
@@ -136,12 +142,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         // 设置 Adapter
         if (resourceId == R.id.recyclerViewIncommingBlackList) {
-            adapter = new PhoneInfoAdapter(this, getIncommingBlackList());
+            mIncommingBlackListPhoneInfoAdapter = new PhoneInfoAdapter(this, getIncommingBlackList());
+            recyclerView.setAdapter(mIncommingBlackListPhoneInfoAdapter);
         } else if (resourceId == R.id.recyclerViewSMSBlackList) {
-            adapter = new PhoneInfoAdapter(this, getSMSBlackList());
+            mSMSBlackListPhoneInfoAdapter = new PhoneInfoAdapter(this, getSMSBlackList());
+            recyclerView.setAdapter(mSMSBlackListPhoneInfoAdapter);
         }
-
-        recyclerView.setAdapter(adapter);
 
         recyclerView.setHasFixedSize(true);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
@@ -174,9 +180,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         switch (v.getId()) {
             case R.id.fab: {
                 if (mViewPager.getCurrentItem() == PAGE_INCOMMINGBLACKLIST) {
-                    getIncommingBlackListDialog().show();
+                    mIncommingBlackLisDialogPlus = getIncommingBlackListDialog();
+                    mIncommingBlackLisDialogPlus.show();
                 } else if (mViewPager.getCurrentItem() == PAGE_SMSBLACKLIST) {
-                    getSMSBlackListDialog().show();
+                    mSMSBlackLisDialogPlus = getSMSBlackListDialog();
+                    mSMSBlackLisDialogPlus.show();
                 }
                 break;
             }
@@ -185,6 +193,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     /**
      * 得到来电黑名单 FloatActionButton 对话框
+     *
      * @return
      */
     private DialogPlus getIncommingBlackListDialog() {
@@ -209,7 +218,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 .setOnItemClickListener(new OnItemClickListener() {
                     @Override
                     public void onItemClick(DialogPlus dialog, Object item, View view, int position) {
-
+                        if (position == 0) {
+                            Intent intent = new Intent(getApplicationContext(), AddPhoneNumDialogActivity.class);
+                            intent.addFlags(INTENT_FLAG_INCOMMING);
+                            startActivityForResult(intent, INTENT_ADD_PHONE_NUM);
+                        }
                     }
                 }).create();
 
@@ -228,6 +241,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     /**
      * 得到来电黑名单 FloatActionButton 对话框
+     *
      * @return
      */
     private DialogPlus getSMSBlackListDialog() {
@@ -255,7 +269,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 .setOnItemClickListener(new OnItemClickListener() {
                     @Override
                     public void onItemClick(DialogPlus dialog, Object item, View view, int position) {
-
+                        if (position == 0) {
+                            Intent intent = new Intent(getApplicationContext(), AddPhoneNumDialogActivity.class);
+                            intent.addFlags(INTENT_FLAG_SMS);
+                            startActivityForResult(intent, INTENT_ADD_PHONE_NUM);
+                        }
 
                     }
                 }).create();
@@ -291,5 +309,36 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
         }
         return result;
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == INTENT_ADD_PHONE_NUM) {
+            if (mIncommingBlackLisDialogPlus != null && mIncommingBlackLisDialogPlus.isShowing()) {
+                mIncommingBlackLisDialogPlus.dismiss();
+            }
+
+            if (mSMSBlackLisDialogPlus != null && mSMSBlackLisDialogPlus.isShowing()) {
+                mSMSBlackLisDialogPlus.dismiss();
+            }
+
+            if (resultCode == RESULT_OK) {
+                Bundle b = data.getExtras();
+                if (b != null) {
+                    PhoneInfo phoneInfo = new PhoneInfo(b.getString("phoneNum"), b.getInt("inIncommingBlack"), b.getInt("inSMSBlack"));
+                    mPhoneInfoList.add(0, phoneInfo);
+                    if (b.getInt("inIncommingBlack") == 1) {
+                        if (mIncommingBlackListPhoneInfoAdapter != null) {
+                            mIncommingBlackListPhoneInfoAdapter.addDate(phoneInfo);
+                        }
+                    }
+                    if (b.getInt("inSMSBlack") == 1) {
+                        if (mSMSBlackListPhoneInfoAdapter != null) {
+                            mSMSBlackListPhoneInfoAdapter.addDate(phoneInfo);
+                        }
+                    }
+                }
+            }
+        }
     }
 }

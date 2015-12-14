@@ -78,7 +78,7 @@ public class PhoneInfoAdapter extends RecyclerView.Adapter<PhoneInfoViewHolder> 
      * @param phoneInfo
      */
     public void addDate(PhoneInfo phoneInfo) {
-        mDatas.add(phoneInfo);
+        mDatas.add(0, phoneInfo);
         notifyItemInserted(mDatas.indexOf(phoneInfo));
     }
 
