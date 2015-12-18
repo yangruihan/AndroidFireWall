@@ -1,4 +1,4 @@
-package com.yrh.androidfirewall;
+package com.yrh.firewall;
 
 import org.junit.Test;
 

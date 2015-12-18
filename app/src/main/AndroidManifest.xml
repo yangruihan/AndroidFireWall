@@ -1,6 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.yrh.androidfirewall">
+    package="com.yrh.firewall">
+
+    <uses-permission android:name="android.permission.RECEIVE_SMS" />
+    <uses-permission android:name="android.permission.READ_SMS" />
+    <uses-permission android:name="android.permission.SEND_SMS" />
+
+    <!-- 挂断手机的权限 -->
+    <uses-permission android:name="android.permission.CALL_PHONE"/>
+    <!-- 读取手机状态的权限 -->
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <!-- 读content的权限 -->
+    <uses-permission android:name="android.permission.READ_CONTACTS" />
 
     <application
         android:allowBackup="true"
@@ -8,8 +19,9 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+
         <activity
-            android:name=".activity.MainActivity"
+            android:name="com.yrh.firewall.activity.MainActivity"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
@@ -18,9 +30,19 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".activity.AddPhoneNumDialogActivity"
+
+        <activity android:name="com.yrh.firewall.activity.AddPhoneNumDialogActivity"
             android:theme="@style/MyDialogBottom">
         </activity>
+
+        <receiver android:name=".receiver.PhoneIncommingReceiver"
+            android:enabled="true"
+            android:exported="true">
+        </receiver>
+
+        <service android:name="com.yrh.firewall.service.IncommingBlackListService"
+            android:exported="false">
+        </service>
 
     </application>
 
