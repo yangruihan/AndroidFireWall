@@ -10,6 +10,7 @@ import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -27,6 +28,7 @@ import com.yrh.firewall.adapter.PagerViewAdapter;
 import com.yrh.firewall.adapter.PhoneInfoAdapter;
 import com.yrh.firewall.model.PhoneInfo;
 import com.yrh.firewall.service.IncommingBlackListService;
+import com.yrh.firewall.service.SMSBlackListService;
 import com.yrh.firewall.utils.DBOpenHelper;
 
 import java.util.ArrayList;
@@ -88,6 +90,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mDbOpenHelper = new DBOpenHelper(this, "db", null, DBOpenHelper.DB_VERSION);
 
         mPhoneInfoList = mDbOpenHelper.getAllPhoneInfo();
+
+        for (PhoneInfo phoneInfo : mPhoneInfoList) {
+            Log.i("PhoneINFO", phoneInfo.getPhoneNum() + " " + phoneInfo.getInIncommingBlack() + " " + phoneInfo.getInSMSBlack());
+        }
     }
 
 
@@ -147,6 +153,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         });
 
         mSwitchSMSBlackList = (Switch) settingsView.findViewById(R.id.switchSMSBlackList);
+        mSwitchSMSBlackList.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                Intent intent = new Intent(MainActivity.this, SMSBlackListService.class);
+                if (isChecked) {
+                    startService(intent);
+                } else {
+                    stopService(intent);
+                }
+            }
+        });
     }
 
     /**

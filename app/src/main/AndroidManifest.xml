@@ -21,7 +21,7 @@
         android:theme="@style/AppTheme">
 
         <activity
-            android:name="com.yrh.firewall.activity.MainActivity"
+            android:name=".activity.MainActivity"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
@@ -31,17 +31,26 @@
             </intent-filter>
         </activity>
 
-        <activity android:name="com.yrh.firewall.activity.AddPhoneNumDialogActivity"
+        <activity android:name=".activity.AddPhoneNumDialogActivity"
             android:theme="@style/MyDialogBottom">
         </activity>
 
         <receiver android:name=".receiver.PhoneIncommingReceiver"
-            android:enabled="true"
-            android:exported="true">
+            android:exported="false">
         </receiver>
 
-        <service android:name="com.yrh.firewall.service.IncommingBlackListService"
+        <receiver android:name=".receiver.SMSReceiver"
             android:exported="false">
+        </receiver>
+
+        <service android:name=".service.IncommingBlackListService"
+            android:exported="true"
+            android:enabled="true">
+        </service>
+
+        <service android:name=".service.SMSBlackListService"
+            android:exported="true"
+            android:enabled="true">
         </service>
 
     </application>

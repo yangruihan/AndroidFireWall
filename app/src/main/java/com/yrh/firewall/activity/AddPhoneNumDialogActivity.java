@@ -47,7 +47,7 @@ public class AddPhoneNumDialogActivity extends AppCompatActivity {
             public void onClick(View v) {
                 String phoneNum = mEditText.getText().toString().trim();
 
-                if (phoneNum.length() == 11) {
+//                if (phoneNum.length() == 11) {
                     try {
                         Long.parseLong(phoneNum);
 
@@ -95,11 +95,11 @@ public class AddPhoneNumDialogActivity extends AppCompatActivity {
                         snackbar.show();
                         return;
                     }
-                } else {
-                    Snackbar snackbar = Snackbar.make(v, "输入有误，请重新输入", Snackbar.LENGTH_SHORT);
-                    snackbar.show();
-                    return;
-                }
+//                } else {
+//                    Snackbar snackbar = Snackbar.make(v, "输入有误，请重新输入", Snackbar.LENGTH_SHORT);
+//                    snackbar.show();
+//                    return;
+//                }
             }
         });
 

@@ -20,7 +20,7 @@ public class IncommingBlackListService extends Service {
     private PhoneIncommingReceiver phoneIncommingReceiver;
 
     public IncommingBlackListService() {
-        phoneIncommingReceiver = new PhoneIncommingReceiver();
+
     }
 
     @Override
@@ -29,16 +29,21 @@ public class IncommingBlackListService extends Service {
 
         Log.i("INFO", "Service start");
 
+        phoneIncommingReceiver = new PhoneIncommingReceiver();
+
         IntentFilter phoFilter=new IntentFilter();
         phoFilter.addAction(CALL_PHONE_RECEIVED);
         phoFilter.addAction(PHONE_STATE_RECEIVED);
-        phoFilter.setPriority(1000);
+        phoFilter.setPriority(10000);
         registerReceiver(phoneIncommingReceiver, phoFilter);
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
+
+        Log.i("INFO", "Service stop");
+
         unregisterReceiver(phoneIncommingReceiver);
     }
 
